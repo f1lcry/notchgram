@@ -31,6 +31,8 @@ The first public release: Telegram, living in your MacBook's notch.
   unread message under an "Unread messages" divider, or at the bottom — and a
   chat is marked read only as far as you have actually scrolled.
 - Send text, photos and files; delivery ticks show sent and read.
+- Replies show the quoted message above the bubble, and links in messages
+  are clickable.
 - Search across your chats, public chats and messages.
 
 ### Media
