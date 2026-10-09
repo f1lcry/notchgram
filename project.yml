@@ -1,0 +1,186 @@
+name: NotchGram
+
+# Source of truth for every target. Never edit NotchGram.xcodeproj by hand —
+# it is generated and gitignored. See docs/sessions/session-01-plan.md §3.8.
+# DEVELOPMENT_TEAM lives in Config/Signing.xcconfig at project level, so every
+# target inherits it — no target may set its own. A contributor clone signs
+# with its own team through an untracked Config/Local.xcconfig.
+configFiles:
+  Debug: Config/Signing.xcconfig
+  Release: Config/Signing.xcconfig
+
+options:
+  bundleIdPrefix: com.f1lcry
+  createIntermediateGroups: true
+  deploymentTarget:
+    macOS: "26.0"
+
+# `make generate` runs scripts/gen-secrets.sh BEFORE xcodegen, because XcodeGen
+# resolves source globs at generate time: Secrets.generated.swift must already
+# exist under Sources/TelegramCore or neither target would reference it. Always
+# build through the Makefile, never by calling xcodegen directly.
+packages:
+  # Pinned by exact version: every TDLibKit tag is a semver *prerelease*, so
+  # `from:`/`majorVersion:` range requirements resolve to nothing.
+  # Wraps TDLib 1.8.66. The bundled TDLibFramework is a *static* xcframework
+  # (MACH_O_TYPE staticlib) — nothing to embed, nothing to re-sign, and a
+  # command-line tool target can link it directly (D19).
+  TDLibKit:
+    url: https://github.com/Swiftgram/TDLibKit
+    exactVersion: "1.5.2-tdlib-1.8.66-022d6020"
+  # Auto-update (D43). Same pin as Dictate, whose release pipeline this one
+  # mirrors. Sparkle is a *dynamic* framework with nested helpers (Autoupdate,
+  # Updater.app, two XPC services), so `make sign-release` signs it inside-out.
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    exactVersion: 2.9.6
+
+schemes:
+  NotchGram:
+    build:
+      targets:
+        NotchGram: all
+        NotchGramTests: [test]
+    run:
+      config: Debug
+      environmentVariables:
+        NOTCHGRAM_DEBUG_BRIDGE: "1"
+    test:
+      config: Debug
+      gatherCoverageData: false
+      targets:
+        - NotchGramTests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+  ITest:
+    build:
+      targets:
+        ITest: all
+    run:
+      config: Debug
+
+targets:
+  NotchGram:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources/App
+      - path: Sources/NotchShell
+      - path: Sources/TelegramCore
+      - path: Sources/Features
+      - path: Sources/DebugBridge
+    dependencies:
+      - package: TDLibKit
+        embed: false
+      - package: Sparkle
+    info:
+      path: Sources/Info.plist
+      properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleDisplayName: NotchGram
+        LSUIElement: true
+        NSHumanReadableCopyright: ""
+        CFBundleURLTypes:
+          - CFBundleURLName: com.f1lcry.notchgram
+            CFBundleURLSchemes: [notchgram]
+        # Sparkle (D43). The feed is an asset of a fixed `feed` release on
+        # github.com, not raw.githubusercontent.com, which is DPI-blocked on
+        # some networks where the download itself works. The EdDSA key is
+        # NotchGram's own (keychain account `notchgram`), never Dictate's.
+        # Automatic checks are on without Sparkle's first-launch consent prompt;
+        # the updater only runs in Release builds (AppUpdater).
+        SUFeedURL: https://github.com/f1lcry/notchgram/releases/download/feed/appcast.xml
+        SUPublicEDKey: pKZBdnWCEaQypvk50ovE0QdhbqeAJzRsNC1+nqNeyKg=
+        SUEnableAutomaticChecks: true
+    preBuildScripts:
+      # Secrets never reach the build log: showEnvVars off here, and every
+      # xcodebuild invocation adds -hideShellScriptEnvironment.
+      - script: "\"$SRCROOT/scripts/gen-secrets.sh\""
+        name: Generate Secrets
+        showEnvVars: false
+        basedOnDependencyAnalysis: false
+    postBuildScripts:
+      # The licences of what ships inside the binary (TDLib with its bundled
+      # SQLCipher and OpenSSL, Sparkle's BSD parts) travel in the bundle. A
+      # script rather than a `resources` entry so the build tolerates the file
+      # being absent; `make verify-release` refuses a Release bundle without it.
+      # Runs before Xcode's final code-signing step, so the copy is sealed.
+      - script: |
+          src="$SRCROOT/THIRD_PARTY_NOTICES.md"
+          dst="$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/THIRD_PARTY_NOTICES.md"
+          if [ -f "$src" ]; then
+            mkdir -p "$(dirname "$dst")"
+            cp "$src" "$dst"
+          else
+            rm -f "$dst"
+            echo "warning: THIRD_PARTY_NOTICES.md is missing at the repo root; the bundle ships without it"
+          fi
+        name: Copy Third-Party Notices
+        showEnvVars: false
+        basedOnDependencyAnalysis: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.f1lcry.notchgram
+        PRODUCT_NAME: NotchGram
+        MARKETING_VERSION: 0.1.0
+        CURRENT_PROJECT_VERSION: 1
+        SWIFT_VERSION: "6.0"
+        CODE_SIGN_STYLE: Automatic
+        ENABLE_HARDENED_RUNTIME: YES
+        COMBINE_HIDPI_IMAGES: YES
+        DEAD_CODE_STRIPPING: YES
+        # No .entitlements file on purpose: the MVP needs generic Keychain,
+        # outbound network and user notifications, none of which require one.
+        # Adding App Sandbox / iCloud / Push / App Groups is what would force a
+        # registered App ID and provisioning profiles.
+
+  NotchGramTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - Tests/Unit
+    dependencies:
+      - target: NotchGram
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        # A hardened-runtime host refuses to dlopen a differently-signed
+        # bundle, and it fails at *load* time, not compile time.
+        CODE_SIGN_STYLE: Automatic
+        SWIFT_VERSION: "6.0"
+
+  NotchGramUITests:
+    type: bundle.ui-testing
+    platform: macOS
+    sources:
+      - Tests/UITests
+    dependencies:
+      - target: NotchGram
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_STYLE: Automatic
+        SWIFT_VERSION: "6.0"
+
+  # Headless test-DC harness. Viable as a `tool` because TDLibFramework is a
+  # static xcframework: no embed phase, no @rpath work (D19).
+  ITest:
+    type: tool
+    platform: macOS
+    sources:
+      - path: Sources/TelegramCore
+      - path: ITest
+    dependencies:
+      - package: TDLibKit
+        embed: false
+    settings:
+      base:
+        PRODUCT_NAME: notchgram-itest
+        SWIFT_VERSION: "6.0"
+        CODE_SIGN_STYLE: Automatic
+        ENABLE_HARDENED_RUNTIME: NO

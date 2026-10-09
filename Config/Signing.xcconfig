@@ -1,0 +1,17 @@
+// Signing for every NotchGram target (Debug and Release), applied at project
+// level by project.yml. Targets must NOT set DEVELOPMENT_TEAM themselves, or
+// they would shadow this file and the override below.
+//
+// The default is the author's team. A contributor builds under their own team
+// without touching tracked files:
+//
+//     cp Config/Local.xcconfig.example Config/Local.xcconfig   # untracked
+//     # then set DEVELOPMENT_TEAM = <your team id> in it
+//
+// The bundle id com.f1lcry.notchgram is frozen (TCC identity); a fork that
+// signs with another team may want its own PRODUCT_BUNDLE_IDENTIFIER too.
+
+DEVELOPMENT_TEAM = 5LB8P9852U
+
+// Optional, and last on purpose: whatever it sets wins.
+#include? "Local.xcconfig"
