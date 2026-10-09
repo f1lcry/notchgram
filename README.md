@@ -134,6 +134,7 @@ You need:
 git clone https://github.com/f1lcry/notchgram.git
 cd notchgram
 cp .env.example .env        # fill in TELEGRAM_API_ID and TELEGRAM_API_HASH
+echo 'DEVELOPMENT_TEAM =' > Config/Local.xcconfig   # sign locally (see notes)
 make deps                   # resolves TDLibKit (one ~343 MB download, cached)
 make build                  # Debug build
 make run                    # launches it
@@ -144,9 +145,12 @@ Notes:
 
 - `project.yml` is the source of truth. The Xcode project is generated from it
   and is not committed, so always build through `make`.
-- Debug builds use automatic signing. To sign with your own team, copy
-  `Config/Local.xcconfig.example` to `Config/Local.xcconfig` (untracked) and set
-  `DEVELOPMENT_TEAM` there. Don't edit `project.yml` for this.
+- Signing: the tracked `Config/Signing.xcconfig` names the author's Apple
+  team, so without an override `make build` fails with "No signing certificate
+  … matching team ID". `Config/Local.xcconfig` (untracked) overrides it: an
+  empty `DEVELOPMENT_TEAM`, as above, signs locally (ad-hoc), which is enough
+  to build, run and test; set it to your own team ID to sign with your Apple
+  developer account. Don't edit `project.yml` for this.
 - `.env` is gitignored. The credentials reach the app only through
   `scripts/gen-secrets.sh` at build time, and are never logged.
 - `scripts/preflight.sh` checks the full automation setup (Developer ID

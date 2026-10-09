@@ -36,7 +36,11 @@ Out of scope, please report upstream:
   a database stored next to it under the same user account.
 - The app contains a DebugBridge: an HTTP control channel on a Unix domain
   socket at `~/Library/Application Support/NotchGram/debug.sock`, used for
-  automated testing. It is compiled into every build but inert unless enabled
-  with `defaults write com.f1lcry.notchgram DebugBridgeEnabled -bool YES` or the
-  `NOTCHGRAM_DEBUG_BRIDGE=1` environment variable. Only processes running as
-  the same user can reach the socket.
+  automated testing. It exists in Debug builds only: it is compiled out of
+  Release builds (the ones published as releases), and `make verify-release`
+  fails if any of it reaches the Release binary (D43). In a Debug build it is
+  inert unless enabled with
+  `defaults write com.f1lcry.notchgram DebugBridgeEnabled -bool YES` or the
+  `NOTCHGRAM_DEBUG_BRIDGE=1` environment variable; `make run` and the Xcode
+  scheme enable it. Only processes running as the same user can reach the
+  socket.

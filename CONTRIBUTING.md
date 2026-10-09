@@ -7,7 +7,8 @@ open an issue first so we can agree on the approach before you write code.
 
 Follow [Build from source](README.md#build-from-source) in the README: Xcode 26+,
 `brew install xcodegen jq`, your own `api_id`/`api_hash` from
-[my.telegram.org](https://my.telegram.org) in `.env`, then `make deps`.
+[my.telegram.org](https://my.telegram.org) in `.env`, a `Config/Local.xcconfig`
+with your own (or an empty) `DEVELOPMENT_TEAM`, then `make deps`.
 
 Never commit `.env`, `Secrets.generated.swift` or any credential. Never paste
 real chat content, phone numbers or account data into issues, commits or
