@@ -20,8 +20,8 @@ Brief: [sessions/session-06-telegram-parity.md](sessions/session-06-telegram-par
 report: [sessions/session-06-report.md](sessions/session-06-report.md).
 Earlier: Session 4 [sessions/session-04-ux-fixes.md](sessions/session-04-ux-fixes.md);
 Session 2 [sessions/session-02-stabilize-ux.md](sessions/session-02-stabilize-ux.md).
-`v0.1.0` is still untagged — the founder's acceptance pass is the next
-touch. Session 1: [sessions/session-01-report.md](sessions/session-01-report.md).
+`v0.1.0` shipped as the first public release (2026-10-09) — see
+"Open-source release" below. Session 1: [sessions/session-01-report.md](sessions/session-01-report.md).
 Concept: [CONCEPT.md](CONCEPT.md) · Decisions & module map: [ARCHITECTURE.md](ARCHITECTURE.md)
 Session 1 implementation layer: [sessions/session-01-plan.md](sessions/session-01-plan.md)
 
