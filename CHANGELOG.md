@@ -7,7 +7,7 @@ GitHub release notes and the text of the in-app update dialog, so write for
 users: what changed and why it matters, no internals. A heading that still
 says "Unreleased" is stamped with the release date by the release itself.
 
-## 0.1.0 — Unreleased
+## 0.1.0 — 2026-10-09
 
 The first public release: Telegram, living in your MacBook's notch.
 

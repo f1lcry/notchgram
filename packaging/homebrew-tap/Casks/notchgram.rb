@@ -1,6 +1,6 @@
 cask "notchgram" do
   version "0.1.0"
-  sha256 "0000000000000000000000000000000000000000000000000000000000000000"
+  sha256 "44f974922e416371c4e1f78ec9ef1634cb473767108cc4c2de0c978b738f8214"
 
   url "https://github.com/f1lcry/notchgram/releases/download/v#{version}/NotchGram-#{version}.dmg"
   name "NotchGram"
