@@ -6,7 +6,7 @@
 // without touching tracked files:
 //
 //     cp Config/Local.xcconfig.example Config/Local.xcconfig   # untracked
-//     # then set DEVELOPMENT_TEAM = <your team id> in it
+//     # leave DEVELOPMENT_TEAM empty to sign ad-hoc, or set your team id
 //
 // The bundle id com.f1lcry.notchgram is frozen (TCC identity); a fork that
 // signs with another team may want its own PRODUCT_BUNDLE_IDENTIFIER too.

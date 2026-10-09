@@ -1,4 +1,8 @@
-// Copy to Config/Local.xcconfig (ignored by version control) to build under
-// your own Apple developer team. Find the id at developer.apple.com →
-// Membership, or in Xcode → Settings → Accounts.
-DEVELOPMENT_TEAM = YOURTEAMID
+// Copy to Config/Local.xcconfig (ignored by version control) to override the
+// author's team from Config/Signing.xcconfig.
+//
+// Leave DEVELOPMENT_TEAM empty to sign ad-hoc, which is enough for local
+// builds, runs and tests. Or put your own Apple developer team ID here to sign
+// with your account; find it at developer.apple.com → Membership, or in
+// Xcode → Settings → Accounts.
+DEVELOPMENT_TEAM =
