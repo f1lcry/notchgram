@@ -47,6 +47,8 @@ servers.
 - Text messages with delivery and read ticks, typing indicators, date
   separators and reactions (shown, not yet sent). Channel footer with
   mute/unmute, and the composer is hidden where you can't post.
+- Replies show the quoted message above the bubble, and links in messages
+  are clickable.
 - Search covers your chats, public chats by username, and messages across
   all chats.
 - Notifications for new messages in unmuted chats.
